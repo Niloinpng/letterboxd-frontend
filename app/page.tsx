@@ -1,101 +1,154 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { TextField, Button, Typography, CircularProgress } from "@mui/material";
+
+type LoginFormInputs = {
+  email: string;
+  password: string;
+  name?: string; // Campo extra para cadastro
+  confirmPassword?: string; // Campo extra para cadastro
+};
+
+export default function LoginPage() {
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormInputs>();
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [isLogin, setIsLogin] = useState(true); // Alterna entre login e cadastro
+
+  const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
+    setLoginError(null); // Reset error on new submission
+    try {
+      console.log("Dados enviados:", data);
+      if (isLogin) {
+        // Simulação de login
+        if (data.email !== "admin@email.com" || data.password !== "123456") {
+          throw new Error("Credenciais inválidas");
+        }
+        alert("Login bem-sucedido!");
+      } else {
+        // Simulação de cadastro
+        if (data.password !== data.confirmPassword) {
+          throw new Error("As senhas não coincidem!");
+        }
+        alert("Cadastro realizado com sucesso!");
+      }
+    } catch (error) {
+      setLoginError((error as Error).message);
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="flex h-screen bg-preto py-14 px-48">
+      {/* Coluna Esquerda - 40% */}
+      <div className="w-2/5 flex flex-col justify-center items-center p-8 bg-branco rounded-l-xl gap-2">
+      
+        <div className="flex gap-0.5">
+          <div className="w-8 h-8 bg-verde rounded-full"></div>
+          <div className="w-8 h-8 bg-azul rounded-full"></div>
+          <div className="w-8 h-8 bg-laranja rounded-full"></div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        <h1 className="font-ibm font-bold text-preto text-4xl">
+          Letterbox
+        </h1>
+        
+        <p className="font-ibm text-cinzaescuro text-center text-lg whitespace-pre-line">
+        {isLogin
+          ? "Ainda não tem uma conta?\nCadastre-se agora!"
+          : "Já tem uma conta?\nFaça login!"}
+        </p>
+
+        <Button
+          variant="contained"
+          style={{ backgroundColor: "#00E054", fontWeight:"bold" }}
+          onClick={() => setIsLogin(!isLogin)}
+          className="w-48 font-ibm text-lg"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+          {isLogin ? "Criar Conta" : "Fazer Login"}
+        </Button>
+      </div>
+
+      {/* Coluna Direita - 60% */}
+      <div className="w-3/5 flex flex-col justify-center items-center bg-cinzaescuro px-20 py-10 rounded-r-xl gap-2">
+        <h1 className="font-ibm text-4xl text-branco font-bold">
+          {isLogin ? "Login" : "Cadastro"}
+        </h1>
+        <p className="font-ibm text-cinza text-lg text-center">
+          {isLogin ? "Bem-vindo de volta ao Letterbox" : "Preencha seus dados para criar uma conta"}
+        </p>
+
+        {/* FORMULÁRIO */}
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md">
+          {/* Campos do Cadastro */}
+          {!isLogin && (
+            <>
+              <TextField
+                fullWidth
+                margin="normal"
+                label="Nome Completo"
+                {...register("name", { required: "O nome é obrigatório" })}
+                error={!!errors.name}
+                helperText={errors.name?.message}
+                InputProps={{ style: { fontFamily: "IBM Plex Sans" } }} // Aplica a fonte
+              />
+            </>
+          )}
+
+          {/* Campos comuns (Login e Cadastro) */}
+          <TextField
+            fullWidth
+            margin="normal"
+            label="E-mail"
+            type="email"
+            {...register("email", { required: "O e-mail é obrigatório" })}
+            error={!!errors.email}
+            helperText={errors.email?.message}
+            InputProps={{ style: { fontFamily: "IBM Plex Sans" } }}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Senha"
+            type="password"
+            {...register("password", { required: "A senha é obrigatória" })}
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            InputProps={{ style: { fontFamily: "IBM Plex Sans" } }}
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+          {/* Campo de confirmação de senha no cadastro */}
+          {!isLogin && (
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Confirme sua Senha"
+              type="password"
+              {...register("confirmPassword", { required: "Confirme sua senha" })}
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword?.message}
+              InputProps={{ style: { fontFamily: "IBM Plex Sans" } }}
+            />
+          )}
+
+          {loginError && (
+            <Typography color="error" className="mt-2 font-ibm">
+              {loginError}
+            </Typography>
+          )}
+
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className="mt-4 font-ibm text-lg"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? <CircularProgress size={24} color="inherit" /> : isLogin ? "Entrar" : "Cadastrar"}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
