@@ -1,4 +1,3 @@
-import "@fontsource/poppins"; // Importa a fonte Poppins
 import "@fontsource/ibm-plex-sans"; // Importa a fonte IBM Plex Sans
 import "./globals.css"; // Mantém os estilos globais
 
