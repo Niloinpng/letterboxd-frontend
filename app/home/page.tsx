@@ -6,7 +6,6 @@ import CardFilm from "@/app/components/CardFilm";
 import { FiSearch } from "react-icons/fi"; 
 import { films } from "@/app/data/films";
 
-
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -47,6 +46,7 @@ export default function HomePage() {
           {filteredFilms.map((film) => (
             <CardFilm
               key={film.id}
+              id={film.id}
               title={film.title}
               image={film.image}
               rating={film.rating}
