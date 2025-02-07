@@ -24,8 +24,8 @@ interface CampoProps {
     onFocus,
     
   }: CampoProps) => (
-    <div>
-    <label className="whitespace-nowrap w-14 ml-4 text-left font-ibm text-preto pl-1 text-sm font-bold">
+    <div className="w-full">
+    <label className="whitespace-nowrap w-14 text-left font-ibm text-preto text-sm font-bold">
         {label}:
       </label>
     <div
@@ -39,8 +39,7 @@ interface CampoProps {
         className={`
           w-full font-ibm font-medium focus:outline-none
           placeholder:italic bg-transparent
-          ml-4
-          text-lg
+          text-sm
           ${iserro ? "placeholder-cinzaescuro" : "placeholder:text-cinza"}
         `}
         type={tipo}

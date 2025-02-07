@@ -108,6 +108,8 @@ export default function RegisterForm() {
           onFocus={() => setErros((prev) => ({ ...prev, email: undefined }))}
         />
 
+        <div className="flex flex-row gap-2 justify-between w-full">
+
         <Campo
           name="name"
           id="name"
@@ -131,6 +133,8 @@ export default function RegisterForm() {
           iserro={!!erros?.username}
           onFocus={() => setErros((prev) => ({ ...prev, username: undefined }))}
         />
+
+        </div>
 
         <div className="relative">
           <Campo
