@@ -42,7 +42,6 @@ export default function LoginForm() {
       localStorage.setItem("token", data.access_token);
       setLoginError(null);
       //verificar qual é a página após o login e redirecionar (router.push)
-      alert("Login realizado com sucesso!");
       router.push("/home");
     } catch (error) {
       setLoginError(
