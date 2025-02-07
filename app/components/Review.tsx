@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { FaUserCircle, FaHeart, FaStar } from "react-icons/fa";
+import { FaUserCircle, FaHeart, FaStar, FaComment } from "react-icons/fa";
 import Comment from "./Comment";
+import CommentFormModal from "./CommentFormModal";
 
 interface ReviewProps {
   user: { name: string; image: string };
@@ -15,6 +16,7 @@ interface ReviewProps {
 
 export default function Review({ user, text, rating, likes, comments }: ReviewProps) {
   const [likeCount, setLikeCount] = useState(likes);
+  const [isModal, setIsModal] = useState(false); // 🔥 Corrigido nome do estado
   const [liked, setLiked] = useState(false);
 
   const handleLike = () => {
@@ -23,8 +25,19 @@ export default function Review({ user, text, rating, likes, comments }: ReviewPr
   };
 
   return (
-    <div className="flex flex-col gap-2 p-4">
-      
+    <div className="flex flex-col gap-2 p-4 relative">
+      {/* Modal precisa estar aqui fora da estrutura flex */}
+      {isModal && (
+        <CommentFormModal
+          isOpen={isModal}
+          onClose={() => setIsModal(false)}
+          onSubmit={(comment) => {
+            console.log("Comentário enviado:", { comment });
+            setIsModal(false);
+          }}
+        />
+      )}
+
       {/* Nome + Imagem do Usuário + Estrelas */}
       <div className="flex items-center gap-2">
         {user.image ? (
@@ -47,12 +60,18 @@ export default function Review({ user, text, rating, likes, comments }: ReviewPr
       {/* Texto da Review */}
       <p className="text-sm font-ibm text-cinza">{text}</p>
 
-      {/* Botão de Curtida */}
-      <div className="flex items-center gap-2 pt-1">
-        <button onClick={handleLike} className="focus:outline-none">
-          <FaHeart className={`w-5 h-5 ${liked ? "text-red-500" : "text-cinza"}`} />
+      {/* Botão de Curtida e Comentário */}
+      <div className="flex items-center pt-1 flex-row justify-between">
+        <div className="flex items-center gap-2 flex-row">
+          <button onClick={handleLike} className="focus:outline-none">
+            <FaHeart className={`w-5 h-5 ${liked ? "text-red-500" : "text-cinza"}`} />
+          </button>
+          <p className="text-xs text-cinza font-bold">{likeCount} curtidas</p>
+        </div>
+
+        <button className="focus:outline-none" onClick={() => setIsModal(true)}>
+          <FaComment className="w-5 h-5 text-cinza" />
         </button>
-        <p className="text-xs text-cinza font-bold">{likeCount} curtidas</p>
       </div>
 
       {/* Linha Separadora Grossa */}
