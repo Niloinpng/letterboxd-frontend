@@ -32,5 +32,9 @@ export const validate = (data: TypeUser): Error => {
     erros["senha"] = "Informe sua senha";
   }
 
+  if (!data.confirmarSenha) {
+    erros["confirmarSenha"] = "Confirme sua senha";
+  }
+
   return erros;
 };

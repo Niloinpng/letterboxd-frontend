@@ -5,27 +5,34 @@ import Campo from "../Campo";
 import { TypeUser } from "@/app/types/user";
 import { validate } from "@/app/utils/RegisterValidate";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [senha, setSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
   const [erros, setErros] = useState<TypeUser | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [signUpError, setSignUpError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setSignUpError(null);
 
     const data: TypeUser = {
       email,
       name,
       username,
       senha,
+      confirmarSenha,
     };
 
-    // Validação antes de enviar
+    //Validação antes de enviar
     const validateErros = validate(data);
 
     if (Object.keys(validateErros).length > 0) {
@@ -33,9 +40,19 @@ export default function RegisterForm() {
       return;
     }
 
+    //validação das senhas
+    if (senha !== confirmarSenha) {
+      setErros((prev) => ({
+        ...prev,
+        senha: "As senhas não coincidem",
+        confirmarSenha: "As senhas não coincidem",
+      }));
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:3000/users", {
+      const response = await fetch("http://localhost:3333/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,19 +62,25 @@ export default function RegisterForm() {
           name,
           bio: "sou a sua bio",
           username,
-          password: senha, // O backend espera "password", não "senha"
+          password: senha,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Erro ao cadastrar usuário");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erro ao cadastrar usuário");
       }
 
+      const data = await response.json();
+      localStorage.setItem("token", data.access_token);
+
       alert("Cadastro realizado com sucesso!");
-      router.push("/home"); // Redireciona para a tela de login
+      router.push("/home");
     } catch (error) {
+      setSignUpError(
+        error instanceof Error ? error.message : "Erro ao cadastrar usuário"
+      );
       console.error("Erro no cadastro:", error);
-      alert("Erro ao cadastrar. Verifique os dados.");
     } finally {
       setLoading(false);
     }
@@ -109,17 +132,71 @@ export default function RegisterForm() {
           onFocus={() => setErros((prev) => ({ ...prev, username: undefined }))}
         />
 
-        <Campo
-          name="senha"
-          id="senha"
-          label="Senha"
-          placeholder={erros?.senha ? erros.senha : "Informe sua senha"}
-          tipo="password"
-          valor={senha}
-          onChange={(value) => setSenha(value)}
-          iserro={!!erros?.senha}
-          onFocus={() => setErros((prev) => ({ ...prev, senha: undefined }))}
-        />
+        <div className="relative">
+          <Campo
+            name="senha"
+            id="senha"
+            label="Senha"
+            placeholder={erros?.senha ? erros.senha : "Informe sua senha"}
+            tipo={showPassword ? "text" : "password"}
+            valor={senha}
+            onChange={(value) => setSenha(value)}
+            iserro={!!erros?.senha}
+            onFocus={() => setErros((prev) => ({ ...prev, senha: undefined }))}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-6 top-9 cursor-pointer"
+          >
+            <Image
+              src={showPassword ? "/eyeSlash.svg" : "/eye.svg"}
+              alt={showPassword ? "Esconder senha" : "Mostrar senha"}
+              width={24}
+              height={24}
+            />
+          </button>
+        </div>
+
+        <div className="relative">
+          <Campo
+            name="confirmarSenha"
+            id="confirmarSenha"
+            label="Confirmar Senha"
+            placeholder={
+              erros?.confirmarSenha
+                ? erros.confirmarSenha
+                : "Confirme sua senha"
+            }
+            tipo={showConfirmPassword ? "text" : "password"}
+            valor={confirmarSenha}
+            onChange={(value) => setConfirmarSenha(value)}
+            iserro={!!erros?.confirmarSenha}
+            onFocus={() =>
+              setErros((prev) => ({ ...prev, confirmarSenha: undefined }))
+            }
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute right-6 top-9 cursor-pointer"
+          >
+            <Image
+              src={showConfirmPassword ? "/eyeSlash.svg" : "/eye.svg"}
+              alt={showConfirmPassword ? "Esconder senha" : "Mostrar senha"}
+              width={24}
+              height={24}
+            />
+          </button>
+        </div>
+
+        <div className="pt-2">
+          {signUpError && (
+            <div className="bg-laranja p-3 rounded-md text-sm text-white">
+              {signUpError}
+            </div>
+          )}
+        </div>
 
         <div className="flex flex-col align-middle items-center mt-2">
           <button

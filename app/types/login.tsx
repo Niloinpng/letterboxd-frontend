@@ -1,4 +1,4 @@
 export type TypeLogin = {
-    email?: string;
+    username?: string;
     senha?: string;
 }
