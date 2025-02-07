@@ -2,11 +2,11 @@ export const reviews = [
     {
       id: 1,
       user: {
-        name: "João Silva",
+        name: "SoouJoao",
         image: "", 
       },
       rating: 4.5,
-      text: "Esse filme foi incrível! A fotografia e a trilha sonora são fantásticas.",
+      text: "Eu acho que nunca chorei tanto no cinema como hoje. Mais um que eu fui assistir sabendo absolutamente nada e sai completamente destruído do cinema. Fernanda Torres entrega uma atuação (literalmente) digna de Oscar. Várias cenas que ela te prende totalmente com um simples olhar, em que você capta tudo o que aquela mãe aterrorizada tá sentindo. E a atuação dela é beneficiada com uma filmografia impecável, com uma trilha sonora belíssima e bem utilizada, composta pela maestria do MPB. Todos os personagens bem construídos que fecham uma verdade OBRA que esse filme é.",
       likes: 12,
       comments: [
         {

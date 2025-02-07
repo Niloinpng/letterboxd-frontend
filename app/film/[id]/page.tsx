@@ -23,21 +23,21 @@ export default async function FilmPage({ params }: FilmPageProps) {
 
       <div className="flex-grow flex bg-preto text-cinza font-ibm px-16 py-8 gap-8">
         
-        <div className="w-64 h-96 flex justify-start rounded-lg">
-          {film.image ? (
+      <div className="w-full h-96 relative rounded-lg overflow-hidden">
+        {film.image ? (
             <Image
-              src={film.image}
-              alt={film.title}
-              width={250} // Mantém proporção correta
-              height={380} 
-              className="rounded-lg shadow-lg object-cover"
+                src={film.image}
+                alt={film.title}
+                fill
+                className="object-cover rounded-lg"
             />
-          ) : (
-            <div className="w-64 h-96 bg-cinzaescuro flex items-center justify-center text-preto font-bold rounded-lg">
-              {film.title}
+        ) : (
+            <div className="w-full h-full bg-cinzaescuro flex items-center justify-center text-preto font-bold rounded-lg">
+                {film.title}
             </div>
-          )}
+        )}
         </div>
+
 
         <div className="flex flex-col">
 
@@ -59,8 +59,11 @@ export default async function FilmPage({ params }: FilmPageProps) {
         
             <FaStar className="text-cinza text-3xl" />
             <p className="text-4xl text-cinza font-sans pb-4">{film.rating}</p>
-            <button className="bg-cinzaescuro text-cinza px-6 py-2 rounded-lg hover:bg-opacity-50 transition">
+            <button className="bg-cinzaescuro w-44 text-cinza text-sm px-6 py-2 rounded-lg hover:bg-opacity-50 transition">
                 Faça sua Review
+            </button>
+            <button className="bg-cinzaescuro w-44 text-cinza text-sm px-6 py-2 rounded-lg hover:bg-opacity-50 transition">
+                Adicionar em Lista
             </button>
 
         </div>
