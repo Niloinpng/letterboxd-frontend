@@ -3,4 +3,5 @@ export type TypeUser = {
     name?: string;
     username?: string;
     senha?: string;
+    confirmarSenha?: string;
 }
