@@ -68,7 +68,14 @@ export default function FilmPage({ params }: FilmPageProps) {
           </p>
 
           <p className="text-lg text-cinza leading-relaxed">{film.description}</p>
-
+          
+          <div className="flex flex-wrap gap-1 pt-2">
+                {film.tags.map((tag, index) => (
+                  <span key={index} className="bg-cinzaescuro text-cinza text-sm px-2 py-1 rounded">
+                    {tag}
+                  </span>
+                ))}
+            </div>
         </div>
 
         <div className="w-1/4 flex flex-col items-center gap-2 justify-between">
