@@ -101,7 +101,7 @@ export default function ProfilePage() {
             </button>
           </div>
         </div>
-        <div className="w-full max-w-2xl mt-4">
+        <div className="w-full mt-4">
           {activeTab === "listas" ? <UserLists userId={user.id} /> : <UserReviews userId={user.id} />}
         </div>
         </div>
