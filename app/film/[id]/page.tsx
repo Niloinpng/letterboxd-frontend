@@ -10,13 +10,14 @@ import { FaStar, FaComment } from "react-icons/fa";
 import { reviews } from "@/app/data/reviews";
 import Review from "@/app/components/Review";
 import ReviewFormModal from "@/app/components/ReviewFormModal";
+import AddToListModal from "@/app/components/AddToListModal";
 interface FilmPageProps {
   params: { id: string };
 }
 
 export default function FilmPage({ params }: FilmPageProps) {
     const [isModelReviews, SetIsModalReviewsOpen] = useState(false);
-
+    const [isModalLists, setIsModalListsOpen] = useState(false);
     const { id } = React.use(params);
     const filmId = Number(id); // Converte ID para número
     const film = films.find((f) => f.id === filmId);
@@ -38,6 +39,14 @@ export default function FilmPage({ params }: FilmPageProps) {
           console.log("Review enviada:", { rating, reviewText });
         }}
       />
+      
+      <AddToListModal
+          isOpen={isModalLists}
+          onClose={() => setIsModalListsOpen(false)}
+          onSubmit={(listId) => {
+            console.log(`Filme "${film.title}" adicionado à lista ${listId}`);
+          }}
+        />
 
       <div className="w-full h-96 relative rounded-lg overflow-hidden">
         {film.image ? (
@@ -96,7 +105,9 @@ export default function FilmPage({ params }: FilmPageProps) {
             >
                 Faça sua Review
             </button>
-            <button className="bg-cinzaescuro w-44 text-cinza text-sm px-6 py-2 rounded-lg hover:bg-opacity-50 transition">
+            <button className="bg-cinzaescuro w-44 text-cinza text-sm px-6 py-2 rounded-lg hover:bg-opacity-50 transition"
+                    onClick={() => setIsModalListsOpen(true)}
+            >
                 Adicionar em Lista
             </button>
             </div>
