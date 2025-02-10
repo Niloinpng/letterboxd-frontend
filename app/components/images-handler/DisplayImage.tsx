@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 
 interface DisplayImageProps {
-  endpoint: string; // API endpoint for fetching (e.g., '/api/users/1/profile-picture' or '/api/media/1/cover')
+  endpoint: string;
   alt: string;
   className?: string;
   fallbackImage?: string;
@@ -12,7 +12,7 @@ export const DisplayImage = ({
   endpoint,
   alt,
   className,
-  fallbackImage = "/placeholder-image.png",
+  fallbackImage = "",
 }: DisplayImageProps) => {
   const [imageData, setImageData] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -21,7 +21,12 @@ export const DisplayImage = ({
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        const response = await fetch(endpoint);
+        const response = await fetch(endpoint, {
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Ajuste conforme seu token
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch image");
