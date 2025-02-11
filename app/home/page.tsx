@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/NavBar";
 import CardFilm from "@/app/components/CardFilm";
-import { FiSearch } from "react-icons/fi"; 
+import { FiSearch } from "react-icons/fi";
 
 interface Film {
   id: number;
@@ -20,25 +20,35 @@ export default function HomePage() {
 
   // Função para converter Buffer para Base64
   const bufferToBase64 = (bufferData: number[]) => {
-    const binaryString = bufferData.map((byte) => String.fromCharCode(byte)).join("");
+    const binaryString = bufferData
+      .map((byte) => String.fromCharCode(byte))
+      .join("");
     return `data:image/jpeg;base64,${btoa(binaryString)}`;
   };
 
   useEffect(() => {
     async function fetchFilms() {
       try {
-        const res = await fetch("http://localhost:3333/media");
+        const token = localStorage.getItem("token"); // Pega o token salvo após login
+        const res = await fetch("http://localhost:3333/media", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
         if (!res.ok) throw new Error("Erro ao buscar filmes");
-        
+
         const data = await res.json();
 
         // Mapeia os filmes da API e ajusta os dados
         const formattedFilms = data.map((film: any) => ({
           id: film.id,
           title: film.title,
-          image: film.cover_url?.data ? bufferToBase64(film.cover_url.data) : null, // Converte a imagem
+          image: film.cover_url?.data
+            ? bufferToBase64(film.cover_url.data)
+            : null, // Converte a imagem
           rating: film.average_rating ? parseFloat(film.average_rating) : 5, // Define 5 se não houver
-          comments: 5 // Como a API ainda não fornece, definimos 5
+          comments: 5, // Como a API ainda não fornece, definimos 5
         }));
 
         setFilms(formattedFilms);
@@ -54,7 +64,7 @@ export default function HomePage() {
 
   // Filtra os filmes pelo título digitado na barra de pesquisa
   const filteredFilms = films.filter((film) =>
-    film.title.toLowerCase().includes(searchTerm.toLowerCase())
+    film.title.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -62,7 +72,6 @@ export default function HomePage() {
       <Navbar />
 
       <div className="flex-grow flex flex-col items-center bg-preto text-cinza font-ibm gap-4">
-        
         {/* Barra de pesquisa */}
         <div className="relative w-80 py-4">
           <input
@@ -80,7 +89,9 @@ export default function HomePage() {
         </div>
 
         {/* Exibir mensagem de carregamento */}
-        {loading && <p className="text-branco text-center mt-4">Carregando filmes...</p>}
+        {loading && (
+          <p className="text-branco text-center mt-4">Carregando filmes...</p>
+        )}
 
         {/* Grid de filmes */}
         <div className="grid grid-cols-6 gap-8 justify-items-center">

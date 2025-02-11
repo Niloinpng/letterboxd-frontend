@@ -16,6 +16,14 @@ import { EditReviewModal } from "./EditReviewModal";
 import AlertModal from "@/app/components/AlertModal";
 import { CreateReviewModal } from "./CreateReviewModal";
 
+interface Review {
+  id: number;
+  media_title: string;
+  content: string;
+  rating: number;
+  user_id: number;
+}
+
 interface UserReviewsProps {
   userId: number;
 }
