@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 
 interface AddListModalProps {
@@ -12,17 +12,58 @@ interface AddListModalProps {
 export default function AddListModal({ isOpen, onClose, onAddList }: AddListModalProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [userId, setUserId] = useState<number | null>(null);
+
+  // 🔹 Obtém o ID do usuário logado ao abrir o modal
+  useEffect(() => {
+    async function fetchUserId() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Erro: Token não encontrado.");
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:3333/auth/me", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) throw new Error("Erro ao buscar ID do usuário");
+
+        const user = await res.json();
+        setUserId(Number(user.id)); // 🔥 Converte para número inteiro
+      } catch (error) {
+        console.error("Erro ao obter ID do usuário:", error);
+      }
+    }
+
+    if (isOpen) fetchUserId();
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
+  // 🔹 Enviar requisição para criar a nova lista
   const handleSubmit = async () => {
-    if (!name.trim() || !description.trim()) return;
+    if (!name.trim() || !description.trim() || userId === null) {
+      console.error("Erro: Campos vazios ou usuário não autenticado.");
+      return;
+    }
 
     try {
       const res = await fetch("http://localhost:3333/lists", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, description, user_id: 1 }), // Simulando user_id
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userId, // ✅ Garante que o user_id seja inteiro
+          name,
+          description,
+        }),
       });
 
       if (!res.ok) throw new Error("Erro ao criar lista");
@@ -31,7 +72,7 @@ export default function AddListModal({ isOpen, onClose, onAddList }: AddListModa
       onAddList(newList);
       onClose();
     } catch (error) {
-      console.error(error);
+      console.error("Erro ao criar lista:", error);
     }
   };
 
