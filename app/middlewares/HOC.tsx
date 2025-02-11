@@ -26,6 +26,7 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/',
+    '/feed/:id',
     '/film/:id',
     '/home',
     '/profile/:id',
