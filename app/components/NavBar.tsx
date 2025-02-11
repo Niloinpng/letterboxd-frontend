@@ -1,6 +1,7 @@
 "use client";
 
 import { FiLogOut, FiUser } from "react-icons/fi";
+import { CgFeed } from "react-icons/cg";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -21,16 +22,16 @@ export default function Navbar() {
 
       // Faz a requisição para a rota "me" do backend usando fetch
       const response = await fetch("http://localhost:3333/auth/me", {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
 
       // Verifica se a resposta foi bem-sucedida
       if (!response.ok) {
-        throw new Error('Erro ao buscar perfil');
+        throw new Error("Erro ao buscar perfil");
       }
 
       // Extrai os dados da resposta
@@ -52,7 +53,7 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); 
+    localStorage.removeItem("token");
     router.push("/"); // Redireciona para a página de login
   };
 
@@ -60,6 +61,12 @@ export default function Navbar() {
   const navigateToProfile = () => {
     if (userId) {
       router.push(`/profile/${userId}`);
+    }
+  };
+
+  const navigateToFeed = () => {
+    if (userId) {
+      router.push(`/feed/${userId}`);
     }
   };
 
@@ -83,7 +90,15 @@ export default function Navbar() {
       {/* Ícones à direita */}
       <div className="flex items-center gap-4">
         {/* Ícone de usuário */}
-        <div 
+
+        <div
+          className="w-10 h-10 flex items-center justify-center bg-gray-600 rounded-full cursor-pointer"
+          onClick={navigateToFeed}
+        >
+          <CgFeed size={20} />
+        </div>
+
+        <div
           className="w-10 h-10 flex items-center justify-center bg-gray-600 rounded-full cursor-pointer"
           onClick={navigateToProfile}
         >
