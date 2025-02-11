@@ -1,10 +1,8 @@
 "use client";
 
-import React from "react";
-import { notFound } from "next/navigation";
-import { useState } from "react";
+import { useParams, notFound } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { films } from "@/app/data/films";
 import Navbar from "@/app/components/NavBar";
 import { FaStar, FaComment } from "react-icons/fa";
 import { reviews } from "@/app/data/reviews";
@@ -19,11 +17,46 @@ export default function FilmPage({ params }: FilmPageProps) {
     const [isModelReviews, SetIsModalReviewsOpen] = useState(false);
     const [isModalLists, setIsModalListsOpen] = useState(false);
     const { id } = React.use(params);
-    const filmId = Number(id); // Converte ID para número
-    const film = films.find((f) => f.id === filmId);
+    const [film, setFilm] = useState<Film | null>(null);
+    const [loading, setLoading] = useState(true);
     const filmReviews = reviews;
 
-    if (!film) return notFound(); // Retorna erro 404 se o filme não existir
+    const bufferToBase64 = (bufferData: number[]) => {
+        const binaryString = bufferData.map((byte) => String.fromCharCode(byte)).join("");
+        return `data:image/jpeg;base64,${btoa(binaryString)}`;
+      };
+
+    useEffect(() => {
+        async function fetchFilm() {
+          try {
+            const res = await fetch(`http://localhost:3333/media/${id}`);
+            if (!res.ok) throw new Error("Filme não encontrado");
+    
+            const data = await res.json();
+    
+            setFilm({
+              id: data.id,
+              title: data.title,
+              type: data.type,
+              description: data.description,
+              image: data.cover_url?.data ? bufferToBase64(data.cover_url.data) : null,
+              rating: data.average_rating ? parseFloat(data.average_rating) : 5,
+              comments: 5,
+              tags: data.tags || [],
+            });
+          } catch (error) {
+            console.error(error);
+            setFilm(null);
+          } finally {
+            setLoading(false);
+          }
+        }
+    
+        if (id) fetchFilm();
+      }, [id]);
+    
+      if (loading) return <p className="text-branco text-center mt-4">Carregando filme...</p>;
+      if (!film) return notFound();
 
     return (
     <div className="h-screen flex flex-col">
@@ -73,7 +106,7 @@ export default function FilmPage({ params }: FilmPageProps) {
           <h1 className="text-6xl font-ibm font-bold text-branco">{film.title}</h1>
 
           <p className=" text-cinza font-sans font-thin">
-            {film.year} <span className="font-normal pl-4 font-ibm">Dirigido por</span> {film.director}
+            {film.type}
           </p>
 
           <p className="text-lg text-cinza leading-relaxed">{film.description}</p>
