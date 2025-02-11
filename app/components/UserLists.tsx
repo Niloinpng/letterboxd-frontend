@@ -1,9 +1,9 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaPlus, FaChevronDown, FaChevronUp, FaTrash } from "react-icons/fa";
 import AddListModal from "./AddListModal";
-import EditListModal from "./EditListModal";
-import AddMediaModal from "./AddMediaToList";
 
 interface List {
   id: number;
@@ -32,27 +32,17 @@ interface UserListsProps {
   userId: number;
 }
 
-interface MediaItem {
-  id: number;
-  title: string;
-  type: string;
-}
-
 export default function UserLists({ userId }: UserListsProps) {
   const [lists, setLists] = useState<List[]>([]);
-  const [listItems, setListItems] = useState<{ [key: number]: ListItem[] }>({});
   const [loading, setLoading] = useState(true);
   const [expandedList, setExpandedList] = useState<number | null>(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isAddMediaModalOpen, setIsAddMediaModalOpen] = useState(false);
-  const [selectedList, setSelectedList] = useState<List | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loggedUserId, setLoggedUserId] = useState<number | null>(null);
   const [listItems, setListItems] = useState<{ [key: number]: ListItem[] }>({});
   const [mediaData, setMediaData] = useState<{ [key: number]: Media }>({});
   const router = useRouter();
 
-  // Fetch logged user
+  // 🔹 Obtém o ID do usuário logado pelo token
   useEffect(() => {
     async function fetchLoggedUser() {
       const token = localStorage.getItem("token");
@@ -60,7 +50,11 @@ export default function UserLists({ userId }: UserListsProps) {
 
       try {
         const res = await fetch("http://localhost:3333/auth/me", {
-          headers: { Authorization: `Bearer ${token}` },
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         });
 
         if (!res.ok) throw new Error("Erro ao obter usuário logado");
@@ -75,7 +69,7 @@ export default function UserLists({ userId }: UserListsProps) {
     fetchLoggedUser();
   }, []);
 
-  // Fetch lists
+  // 🔹 Busca as listas do usuário especificado
   useEffect(() => {
     async function fetchLists() {
       try {
@@ -124,22 +118,12 @@ export default function UserLists({ userId }: UserListsProps) {
     }
   };
 
-  const handleAddList = (newList: {
-    id: number;
-    user_id: number;
-    name: string;
-    description: string;
-  }) => {
-    setLists((prev) => [
-      ...prev,
-      {
-        ...newList,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    ]);
+  // 🔹 Atualiza as listas quando uma nova for adicionada
+  const handleAddList = (newList: List) => {
+    setLists((prev) => [...prev, newList]);
   };
 
+  // 🔥 Função para deletar uma lista
   const handleDeleteList = async (listId: number) => {
     try {
       const res = await fetch(`http://localhost:3333/lists/${listId}`, {
@@ -204,24 +188,7 @@ export default function UserLists({ userId }: UserListsProps) {
     CONCLUÍDO: "bg-verde bg-opacity-50",
   };
 
-  const handleAddMedia = (newMedia: MediaItem) => {
-    if (selectedList) {
-      const newListItem: ListItem = {
-        id: Date.now(),
-        list_id: selectedList.id,
-        media_id: newMedia.id,
-        media: newMedia,
-      };
-
-      setListItems((prev) => ({
-        ...prev,
-        [selectedList.id]: [...(prev[selectedList.id] || []), newListItem],
-      }));
-    }
-  };
-
-  if (loading)
-    return <p className="text-branco text-center mt-4">Carregando listas...</p>;
+  if (loading) return <p className="text-branco text-center mt-4">Carregando listas...</p>;
 
   return (
     <div className="bg-cinzaescuro w-full p-4 rounded-lg text-branco">
@@ -229,7 +196,7 @@ export default function UserLists({ userId }: UserListsProps) {
         {Number(loggedUserId) === Number(userId) && (
           <button
             className="bg-cinza text-branco flex items-center gap-1 px-3 py-2 text-xs rounded-lg hover:bg-opacity-50 transition"
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={() => setIsModalOpen(true)}
           >
             Nova Lista <FaPlus />
           </button>
