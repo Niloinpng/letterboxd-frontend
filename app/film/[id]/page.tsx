@@ -16,10 +16,11 @@ interface FilmPageProps {
 export default function FilmPage({ params }: FilmPageProps) {
     const [isModelReviews, SetIsModalReviewsOpen] = useState(false);
     const [isModalLists, setIsModalListsOpen] = useState(false);
+    const [loggedUserId, setLoggedUserId] = useState<number | null>(null);
     const { id } = React.use(params);
     const [film, setFilm] = useState<Film | null>(null);
     const [loading, setLoading] = useState(true);
-    const filmReviews = reviews;
+    const filmReviews = reviews;      
 
     const bufferToBase64 = (bufferData: number[]) => {
         const binaryString = bufferData.map((byte) => String.fromCharCode(byte)).join("");
@@ -51,8 +52,31 @@ export default function FilmPage({ params }: FilmPageProps) {
             setLoading(false);
           }
         }
+
+        async function fetchLoggedUser() {
+          const token = localStorage.getItem("token");
+          if (!token) return;
+    
+          try {
+            const res = await fetch("http://localhost:3333/auth/me", {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            });
+    
+            if (!res.ok) throw new Error("Erro ao obter usuário logado");
+    
+            const user = await res.json();
+            setLoggedUserId(user.id);
+          } catch (error) {
+            console.error("Erro ao obter usuário logado:", error);
+          }
+        }
     
         if (id) fetchFilm();
+        fetchLoggedUser();
       }, [id]);
     
       if (loading) return <p className="text-branco text-center mt-4">Carregando filme...</p>;
@@ -74,6 +98,8 @@ export default function FilmPage({ params }: FilmPageProps) {
       />
       
       <AddToListModal
+          mediaId={Number(id)}
+          userId={loggedUserId}
           isOpen={isModalLists}
           onClose={() => setIsModalListsOpen(false)}
           onSubmit={(listId) => {
