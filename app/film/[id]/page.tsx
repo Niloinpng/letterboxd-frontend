@@ -10,6 +10,8 @@ import Review from "@/app/components/Review";
 import ReviewFormModal from "@/app/components/ReviewFormModal";
 import AddToListModal from "@/app/components/AddToListModal";
 import { ImageUpload } from "@/app/components/images-handler/ImageUpload";
+import AlertModal from "@/app/components/AlertModal";
+import DeleteMediaButton from "@/app/components/ExcludeMedia";
 interface FilmPageProps {
   params: { id: string };
 }
@@ -139,7 +141,7 @@ export default function FilmPage({ params }: FilmPageProps) {
                 {film.title}
               </h1>
 
-              <p className=" text-cinza font-sans font-thin">{film.type}</p>
+              <p className="text-cinza font-sans font-thin">{film.type}</p>
 
               <p className="text-lg text-cinza leading-relaxed">
                 {film.description}
@@ -204,6 +206,7 @@ export default function FilmPage({ params }: FilmPageProps) {
                     Alterar Capa
                   </div>
                 </ImageUpload>
+                <DeleteMediaButton mediaId={Number(id)} />
               </div>
             </div>
           </div>
