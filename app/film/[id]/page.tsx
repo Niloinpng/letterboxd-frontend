@@ -9,18 +9,19 @@ import { reviews } from "@/app/data/reviews";
 import Review from "@/app/components/Review";
 import ReviewFormModal from "@/app/components/ReviewFormModal";
 import AddToListModal from "@/app/components/AddToListModal";
+import { ImageUpload } from "@/app/components/images-handler/ImageUpload";
 interface FilmPageProps {
   params: { id: string };
 }
 
 export default function FilmPage({ params }: FilmPageProps) {
-    const [isModelReviews, SetIsModalReviewsOpen] = useState(false);
-    const [isModalLists, setIsModalListsOpen] = useState(false);
-    const [loggedUserId, setLoggedUserId] = useState<number | null>(null);
-    const { id } = React.use(params);
-    const [film, setFilm] = useState<Film | null>(null);
-    const [loading, setLoading] = useState(true);
-    const filmReviews = reviews;      
+  const [isModelReviews, SetIsModalReviewsOpen] = useState(false);
+  const [isModalLists, setIsModalListsOpen] = useState(false);
+  const [loggedUserId, setLoggedUserId] = useState<number | null>(null);
+  const { id } = React.use(params);
+  const [film, setFilm] = useState<Film | null>(null);
+  const [loading, setLoading] = useState(true);
+  const filmReviews = reviews;
 
   const bufferToBase64 = (bufferData: number[]) => {
     const binaryString = bufferData
@@ -29,61 +30,63 @@ export default function FilmPage({ params }: FilmPageProps) {
     return `data:image/jpeg;base64,${btoa(binaryString)}`;
   };
 
-    useEffect(() => {
-        async function fetchFilm() {
-          try {
-            const res = await fetch(`http://localhost:3333/media/${id}`);
-            if (!res.ok) throw new Error("Filme não encontrado");
-    
-            const data = await res.json();
-    
-            setFilm({
-              id: data.id,
-              title: data.title,
-              type: data.type,
-              description: data.description,
-              image: data.cover_url?.data ? bufferToBase64(data.cover_url.data) : null,
-              rating: data.average_rating ? parseFloat(data.average_rating) : 5,
-              comments: 5,
-              tags: data.tags || [],
-            });
-          } catch (error) {
-            console.error(error);
-            setFilm(null);
-          } finally {
-            setLoading(false);
-          }
-        }
+  useEffect(() => {
+    async function fetchFilm() {
+      try {
+        const res = await fetch(`http://localhost:3333/media/${id}`);
+        if (!res.ok) throw new Error("Filme não encontrado");
 
-        async function fetchLoggedUser() {
-          const token = localStorage.getItem("token");
-          if (!token) return;
-    
-          try {
-            const res = await fetch("http://localhost:3333/auth/me", {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            });
-    
-            if (!res.ok) throw new Error("Erro ao obter usuário logado");
-    
-            const user = await res.json();
-            setLoggedUserId(user.id);
-          } catch (error) {
-            console.error("Erro ao obter usuário logado:", error);
-          }
-        }
-    
-        if (id) fetchFilm();
-        fetchLoggedUser();
-      }, [id]);
-    
-      if (loading) return <p className="text-branco text-center mt-4">Carregando filme...</p>;
-      if (!film) return notFound();
+        const data = await res.json();
 
+        setFilm({
+          id: data.id,
+          title: data.title,
+          type: data.type,
+          description: data.description,
+          image: data.cover_url?.data
+            ? bufferToBase64(data.cover_url.data)
+            : null,
+          rating: data.average_rating ? parseFloat(data.average_rating) : 5,
+          comments: 5,
+          tags: data.tags || [],
+        });
+      } catch (error) {
+        console.error(error);
+        setFilm(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function fetchLoggedUser() {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const res = await fetch("http://localhost:3333/auth/me", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) throw new Error("Erro ao obter usuário logado");
+
+        const user = await res.json();
+        setLoggedUserId(user.id);
+      } catch (error) {
+        console.error("Erro ao obter usuário logado:", error);
+      }
+    }
+
+    if (id) fetchFilm();
+    fetchLoggedUser();
+  }, [id]);
+
+  if (loading)
+    return <p className="text-branco text-center mt-4">Carregando filme...</p>;
+  if (!film) return notFound();
 
   return (
     <div className="h-screen flex flex-col">
@@ -96,15 +99,15 @@ export default function FilmPage({ params }: FilmPageProps) {
           mediaId={film.id}
         />
 
-      <ReviewFormModal
-        isOpen={isModelReviews}
-        onClose={() => SetIsModalReviewsOpen(false)}
-        onSubmit={(rating, reviewText) => {
-          console.log("Review enviada:", { rating, reviewText });
-        }}
-      />
-      
-      <AddToListModal
+        <ReviewFormModal
+          isOpen={isModelReviews}
+          onClose={() => SetIsModalReviewsOpen(false)}
+          onSubmit={(rating, reviewText) => {
+            console.log("Review enviada:", { rating, reviewText });
+          }}
+        />
+
+        <AddToListModal
           mediaId={Number(id)}
           userId={loggedUserId}
           isOpen={isModalLists}
@@ -178,6 +181,29 @@ export default function FilmPage({ params }: FilmPageProps) {
                 >
                   Adicionar em Lista
                 </button>
+
+                {/* Novo componente de upload */}
+                <ImageUpload
+                  endpoint={`http://localhost:3333/media/${id}/cover`}
+                  onUploadSuccess={() => {
+                    window.location.reload();
+                  }}
+                  className="relative"
+                >
+                  <div
+                    onClick={() => {
+                      const input = document.getElementById(
+                        `file-upload-${Math.random().toString(36).substr(2, 9)}`
+                      );
+                      if (input) {
+                        input.click();
+                      }
+                    }}
+                    className="bg-cinzaescuro w-44 text-cinza text-sm text-center px-6 py-2 rounded-lg hover:bg-opacity-50 transition cursor-pointer"
+                  >
+                    Alterar Capa
+                  </div>
+                </ImageUpload>
               </div>
             </div>
           </div>

@@ -84,6 +84,7 @@ export default function ReviewPage() {
       }
 
       console.log("Comentário enviado com sucesso!");
+      window.location.reload();
 
       // Opcional: Atualizar a review para refletir o novo comentário
     } catch (error) {

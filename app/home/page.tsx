@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/NavBar";
 import CardFilm from "@/app/components/CardFilm";
-import { FiSearch } from "react-icons/fi";
+import { FiPlusCircle, FiSearch } from "react-icons/fi";
+import { CreateMediaModal } from "@/app/components/CreateMediaModal";
 
 interface Film {
   id: number;
@@ -17,6 +18,7 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [films, setFilms] = useState<Film[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Função para converter Buffer para Base64
   const bufferToBase64 = (bufferData: number[]) => {
@@ -64,7 +66,7 @@ export default function HomePage() {
 
   // Filtra os filmes pelo título digitado na barra de pesquisa
   const filteredFilms = films.filter((film) =>
-    film.title.toLowerCase().includes(searchTerm.toLowerCase()),
+    film.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -72,6 +74,21 @@ export default function HomePage() {
       <Navbar />
 
       <div className="flex-grow flex flex-col items-center bg-preto text-cinza font-ibm gap-4">
+        {/* Botão de adicionar mídia */}
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="flex items-center gap-2 bg-azul text-branco px-6 py-3 rounded-lg hover:bg-opacity-80 transition mt-4"
+        >
+          <FiPlusCircle size={20} />
+          Adicionar Mídia
+        </button>
+
+        {/* Modal de criação de mídia */}
+        <CreateMediaModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+        />
+
         {/* Barra de pesquisa */}
         <div className="relative w-80 py-4">
           <input

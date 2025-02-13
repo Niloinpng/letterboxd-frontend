@@ -30,5 +30,6 @@ export const config = {
     '/film/:id',
     '/home',
     '/profile/:id',
+    '/review/:id',  
   ]
 }

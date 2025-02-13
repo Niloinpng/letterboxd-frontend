@@ -38,7 +38,9 @@ export const ImageUpload = ({
     setError(null);
 
     const formData = new FormData();
-    formData.append("image", file);
+    // Verifica se o endpoint contém "cover" para decidir qual chave usar
+    const formDataKey = endpoint.includes("/cover") ? "cover" : "image";
+    formData.append(formDataKey, file);
 
     try {
       const response = await fetch(endpoint, {
@@ -78,38 +80,21 @@ export const ImageUpload = ({
 
       <label
         htmlFor={inputId}
-        className="cursor-pointer"
-        onClick={(e) => {
-          // Previne a propagação do clique para garantir que o input seja acionado
-          e.stopPropagation();
-        }}
+        className="cursor-pointer w-full" // Adicionado w-full
       >
         {children}
       </label>
 
-      {loading && <p className="mt-2 text-gray-600">Uploading...</p>}
-      {error && <p className="mt-2 text-red-500">{error}</p>}
-
-      {/* {preview && (
-        <div
-          className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                    bg-black bg-opacity-50 p-4 rounded-lg z-50"
-        >
-          <Image
-            src={preview}
-            alt="Upload Preview"
-            className="max-w-xs rounded-lg"
-            width={300}
-            height={300}
-            objectFit="contain"
-          />
-          {loading ? (
-            <p className="text-white text-center mt-2">Enviando...</p>
-          ) : (
-            <p className="text-white text-center mt-2">Preview da imagem</p>
-          )}
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
+          <p className="text-white">Enviando...</p>
         </div>
-      )} */}
+      )}
+      {error && (
+        <div className="absolute bottom-0 left-0 right-0 p-2 bg-red-500 text-white text-sm">
+          {error}
+        </div>
+      )}
     </div>
   );
 };

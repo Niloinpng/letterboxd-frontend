@@ -212,8 +212,8 @@ export default function UserLists({ userId }: UserListsProps) {
 
           {expandedList === list.id &&
             listItems[list.id]?.map((item) => (
-              <div key={item.id} className={`p-2 flex justify-between items-center ${statusColors[item.status]}`}>
-                <button className="text-preto hover:underline" onClick={() => router.push(`/film/${item.media_id}`)}>
+              <div key={item.id} className={`p-2 my-2 rounded-xl px-4 flex justify-between items-center ${statusColors[item.status]}`}>
+                <button className="text-branco font-sans font-bold hover:underline" onClick={() => router.push(`/film/${item.media_id}`)}>
                   {mediaData[item.media_id]?.title || "Carregando..."}
                 </button>
                 {Number(loggedUserId) === Number(userId) && (
